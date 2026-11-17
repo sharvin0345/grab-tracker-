@@ -367,14 +367,21 @@
     }
   }
 
+  function isSecretKey(key) {
+    var value = String(key || '').trim();
+    if (/^sb_secret_/i.test(value)) return true;
+    return jwtRole(value) === 'service_role';
+  }
+
   function configStatus(cfg) {
     var url = cfg && String(cfg.SUPABASE_URL || '').trim();
     var key = cfg && String(cfg.SUPABASE_ANON_KEY || '').trim();
     if (!url || !key) return 'missing';
     if (url.indexOf('YOUR_') !== -1 || key.indexOf('YOUR_') !== -1) return 'missing';
     if (!/^https:\/\/.+/i.test(url) || /\s/.test(url)) return 'missing';
+    if (isSecretKey(key)) return 'secret';
+    if (/^sb_publishable_/i.test(key)) return 'ok';
     if (key.length < 20 || /\s/.test(key)) return 'missing';
-    if (jwtRole(key) === 'service_role') return 'secret';
     return 'ok';
   }
 

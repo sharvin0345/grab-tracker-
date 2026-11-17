@@ -74,6 +74,18 @@ var anon = b64url({ alg: 'none' }) + '.' + b64url({ role: 'anon' }) + '.sig';
 var secret = b64url({ alg: 'none' }) + '.' + b64url({ role: 'service_role' }) + '.sig';
 assert.strictEqual(C.configStatus({ SUPABASE_URL: 'https://abc.supabase.co', SUPABASE_ANON_KEY: anon }), 'ok');
 assert.strictEqual(C.configStatus({ SUPABASE_URL: 'https://abc.supabase.co/', SUPABASE_ANON_KEY: secret }), 'secret');
+assert.strictEqual(C.configStatus({
+  SUPABASE_URL: 'https://mzpatcmydulgknegjkzu.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_aMt-fwevnccXe_JaXLYJnQ_-LeqXjuM'
+}), 'ok');
+assert.strictEqual(C.configStatus({
+  SUPABASE_URL: 'https://abc.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_secret_abcdefghijklmnopqrstuvwxyz'
+}), 'secret');
+assert.strictEqual(C.configStatus({
+  SUPABASE_URL: 'https://abc.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_secret_short'
+}), 'secret');
 assert.strictEqual(C.PLATFORMS.length, 9);
 assert.ok(C.PLATFORMS.indexOf('Grab') !== -1);
 assert.ok(C.PLATFORMS.indexOf('AirAsia Ride') !== -1);

@@ -1,5 +1,5 @@
 /* RideTarget shell cache. Network first, so a Pages update is picked up when online. */
-var CACHE = 'ridetarget-shell-v1';
+var CACHE = 'ridetarget-shell-v2';
 var SHELL = [
   './',
   './index.html',

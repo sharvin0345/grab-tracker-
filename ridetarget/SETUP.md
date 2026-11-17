@@ -36,9 +36,8 @@ Until the keys are saved, the app shows **Not connected yet**. That is normal.
 
 1. In Supabase, open **Project Settings** (the gear) → **API** or **API Keys**.
 2. Copy **Project URL**. It looks like `https://abcdefg.supabase.co`.
-3. Copy the **anon public** key. It is a long text that usually starts with `eyJ`.
-4. If you only see a **publishable** key, open the **Legacy anon, service_role API keys** tab and copy **anon public**.
-5. Do **not** copy **service_role** or any key labelled secret. The app will refuse the secret key. Anyone with that key could read every account.
+3. Copy the **publishable** key. It starts with `sb_publishable_`. The older **anon public** key (a long text starting with `eyJ`) also works.
+4. Do **not** copy a key that starts with `sb_secret_` or one labelled **service_role**. The app will refuse it. Anyone with that key could read every account.
 
 ## 4. Paste the keys into the app
 
@@ -107,7 +106,7 @@ In Safari, open the app link → Share → **Add to Home Screen**. The name is R
 ## If something goes wrong
 
 - The page still says **Not connected yet**: the keys in `config.js` were not saved, or Pages has not updated. Wait a minute and refresh.
-- It says **Wrong key**: you pasted the secret service key. Replace it with the anon public key.
+- It says **Wrong key**: you pasted a secret key (`sb_secret_` or service_role). Replace it with the publishable key.
 - A buyer says they paid but still see the waiting screen: on the owner page, check that their email shows **Approved**, then ask them to tap **Refresh**.
 - Reset-password email opens a blank page or an error: add both redirect URLs from step 5, send a new reset from the app, and open the email link in Safari (not inside Gmail’s preview).
 - You cannot see other people on the owner page: step 7 did not run, or the email does not match the one you signed up with. Run the update line again with the exact email.

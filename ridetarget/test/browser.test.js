@@ -105,11 +105,14 @@ async function main() {
         });
         return;
       }
-      if (url.indexOf('/config.js') !== -1 && mode !== 'config') {
+      if (url.indexOf('/config.js') !== -1) {
+        var configBody = mode === 'config'
+          ? 'window.RIDETARGET_CONFIG={SUPABASE_URL:"YOUR_SUPABASE_URL",SUPABASE_ANON_KEY:"YOUR_SUPABASE_ANON_KEY"};'
+          : 'window.RIDETARGET_CONFIG={SUPABASE_URL:"' + SUPABASE + '",SUPABASE_ANON_KEY:"' + ANON + '"};';
         req.respond({
           status: 200,
           contentType: 'text/javascript; charset=utf-8',
-          body: 'window.RIDETARGET_CONFIG={SUPABASE_URL:"' + SUPABASE + '",SUPABASE_ANON_KEY:"' + ANON + '"};'
+          body: configBody
         });
         return;
       }
