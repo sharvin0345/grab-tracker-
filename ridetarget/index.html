@@ -21,100 +21,109 @@
 <body class="gate-open">
   <div id="gate">
     <div class="gate-card">
+      <div class="gate-tools">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn" data-set-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-set-lang="ms">BM</button>
+        </div>
+      </div>
       <div class="gate-brand">
         <img class="gate-logo" src="logo.svg" alt="">
         <div class="gate-name">RideTarget</div>
-        <div class="gate-tag">Daily target for Malaysian drivers</div>
+        <div class="gate-tag" data-i18n="gateTag">Daily target for Malaysian drivers</div>
       </div>
 
       <section id="panel-config" class="gate-panel" hidden>
-        <h1>Not connected yet</h1>
-        <p class="gate-copy">RideTarget is not connected yet. Add the Supabase project URL and the anon public key in <strong>ridetarget/config.js</strong>, then refresh this page. The steps are in SETUP.md.</p>
+        <h1 data-i18n="configTitle">Not connected yet</h1>
+        <p class="gate-copy" data-i18n="configBody">RideTarget is not connected yet. Add the Supabase project URL and the anon public key in ridetarget/config.js, then refresh this page. The steps are in SETUP.md.</p>
       </section>
 
       <section id="panel-secret" class="gate-panel" hidden>
-        <h1>Wrong key</h1>
-        <p class="gate-copy">That key is a secret key. RideTarget accepts the publishable key (it starts with sb_publishable_) or the anon public key. Open config.js and replace it, then refresh.</p>
+        <h1 data-i18n="secretTitle">Wrong key</h1>
+        <p class="gate-copy" data-i18n="secretBody">That key is a secret key. RideTarget accepts the publishable key (it starts with sb_publishable_) or the anon public key. Open config.js and replace it, then refresh.</p>
       </section>
 
       <section id="panel-library" class="gate-panel" hidden>
-        <h1>No connection</h1>
-        <p class="gate-copy">The sign-in library did not load. Check your internet connection, then refresh this page.</p>
+        <h1 data-i18n="libraryTitle">No connection</h1>
+        <p class="gate-copy" data-i18n="libraryBody">The sign-in library did not load. Check your internet connection, then refresh this page.</p>
       </section>
 
       <section id="panel-loading" class="gate-panel" hidden>
-        <h1>Loading…</h1>
-        <p class="gate-copy">Checking your account.</p>
+        <h1 data-i18n="loadingTitle">Loading…</h1>
+        <p class="gate-copy" data-i18n="loadingBody">Checking your account.</p>
       </section>
 
       <section id="panel-auth" class="gate-panel" hidden>
         <div class="auth-tabs" role="tablist">
-          <button type="button" class="auth-tab active" id="tabLogin">Log in</button>
-          <button type="button" class="auth-tab" id="tabSignup">Sign up</button>
+          <button type="button" class="auth-tab active" id="tabLogin" data-i18n="login">Log in</button>
+          <button type="button" class="auth-tab" id="tabSignup" data-i18n="signup">Sign up</button>
         </div>
         <form id="formLogin" class="stack">
-          <label class="field-label" for="loginEmail">Email</label>
-          <div class="text-row"><input id="loginEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required aria-label="Email"></div>
-          <label class="field-label" for="loginPassword">Password</label>
-          <div class="text-row"><input id="loginPassword" type="password" autocomplete="current-password" required aria-label="Password"></div>
-          <button type="submit" class="gate-btn">Log in</button>
-          <button type="button" class="linkish" id="linkForgot">Forgot password?</button>
+          <label class="field-label" for="loginEmail" data-i18n="email">Email</label>
+          <div class="text-row"><input id="loginEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required data-i18n-aria="email" aria-label="Email"></div>
+          <label class="field-label" for="loginPassword" data-i18n="password">Password</label>
+          <div class="text-row"><input id="loginPassword" type="password" autocomplete="current-password" required data-i18n-aria="password" aria-label="Password"></div>
+          <button type="submit" class="gate-btn" data-i18n="login">Log in</button>
+          <button type="button" class="linkish" id="linkForgot" data-i18n="forgot">Forgot password?</button>
         </form>
         <form id="formSignup" class="stack" hidden>
-          <label class="field-label" for="signupEmail">Email</label>
-          <div class="text-row"><input id="signupEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required aria-label="Email"></div>
-          <label class="field-label" for="signupPassword">Password</label>
-          <div class="text-row"><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required aria-label="Password"></div>
-          <p class="gate-copy">Use at least 6 characters. After sign-up the seller activates your account.</p>
-          <button type="submit" class="gate-btn">Create account</button>
+          <label class="field-label" for="signupEmail" data-i18n="email">Email</label>
+          <div class="text-row"><input id="signupEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required data-i18n-aria="email" aria-label="Email"></div>
+          <label class="field-label" for="signupPassword" data-i18n="password">Password</label>
+          <div class="text-row"><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required data-i18n-aria="password" aria-label="Password"></div>
+          <p class="gate-copy" data-i18n="signupHint">Use at least 6 characters. After sign-up the seller activates your account.</p>
+          <button type="submit" class="gate-btn" data-i18n="createAccount">Create account</button>
         </form>
         <form id="formForgot" class="stack" hidden>
-          <p class="gate-copy">We will email you a link to set a new password.</p>
-          <label class="field-label" for="forgotEmail">Email</label>
-          <div class="text-row"><input id="forgotEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required aria-label="Email"></div>
-          <button type="submit" class="gate-btn">Send reset email</button>
-          <button type="button" class="linkish" id="linkForgotBack">Back to log in</button>
+          <p class="gate-copy" data-i18n="forgotHint">We will email you a link to set a new password.</p>
+          <label class="field-label" for="forgotEmail" data-i18n="email">Email</label>
+          <div class="text-row"><input id="forgotEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required data-i18n-aria="email" aria-label="Email"></div>
+          <button type="submit" class="gate-btn" data-i18n="sendReset">Send reset email</button>
+          <button type="button" class="linkish" id="linkForgotBack" data-i18n="backLogin">Back to log in</button>
         </form>
+        <a class="linkish" href="home.html" data-i18n="whatIs">What is RideTarget?</a>
       </section>
 
       <section id="panel-confirm" class="gate-panel" hidden>
-        <h1>Check your email</h1>
-        <p class="gate-copy">Open the message we sent to <strong id="confirmEmail"></strong> and tap the link. Then come back and log in.</p>
-        <button type="button" class="gate-btn" id="btnConfirmLogin">Back to log in</button>
+        <h1 data-i18n="confirmTitle">Check your email</h1>
+        <p class="gate-copy"><span data-i18n="confirmBefore">Open the message we sent to</span> <strong id="confirmEmail"></strong>. <span data-i18n="confirmAfter">Tap the link. Then come back and log in.</span></p>
+        <button type="button" class="gate-btn" id="btnConfirmLogin" data-i18n="backLogin">Back to log in</button>
       </section>
 
       <section id="panel-locked" class="gate-panel" hidden>
-        <h1>Almost there</h1>
-        <p class="gate-copy" id="lockedMessage">Your account is waiting for activation. After payment, send your registered email to the seller.</p>
+        <h1 data-i18n="lockedTitle">Almost there</h1>
+        <p class="gate-copy" id="lockedMessage" data-i18n="lockedBody">Your account is waiting for activation. After payment, send your registered email to the seller.</p>
         <div class="locked-email" id="lockedEmail"></div>
         <div class="stack">
-          <button type="button" class="gate-btn" id="btnRefresh">Refresh</button>
-          <button type="button" class="gate-btn secondary" id="btnCopyEmail">Copy email</button>
-          <button type="button" class="gate-btn secondary" id="btnLockedLogout">Log out</button>
+          <a class="gate-btn" id="btnWhatsApp" href="#" target="_blank" rel="noopener" data-i18n="whatsappCta">WhatsApp the seller</a>
+          <button type="button" class="gate-btn" id="btnRefresh" data-i18n="refresh">Refresh</button>
+          <button type="button" class="gate-btn secondary" id="btnCopyEmail" data-i18n="copyEmail">Copy email</button>
+          <a class="gate-btn secondary" href="home.html" data-i18n="whatIs">What is RideTarget?</a>
+          <button type="button" class="gate-btn secondary" id="btnLockedLogout" data-i18n="logout">Log out</button>
         </div>
       </section>
 
       <section id="panel-recovery" class="gate-panel" hidden>
-        <h1>New password</h1>
+        <h1 data-i18n="recoveryTitle">New password</h1>
         <form id="formRecovery" class="stack">
-          <label class="field-label" for="recoveryPassword">New password</label>
-          <div class="text-row"><input id="recoveryPassword" type="password" autocomplete="new-password" minlength="6" required aria-label="New password"></div>
-          <label class="field-label" for="recoveryPassword2">Repeat password</label>
-          <div class="text-row"><input id="recoveryPassword2" type="password" autocomplete="new-password" minlength="6" required aria-label="Repeat password"></div>
-          <button type="submit" class="gate-btn">Save password</button>
+          <label class="field-label" for="recoveryPassword" data-i18n="newPassword">New password</label>
+          <div class="text-row"><input id="recoveryPassword" type="password" autocomplete="new-password" minlength="6" required data-i18n-aria="newPassword" aria-label="New password"></div>
+          <label class="field-label" for="recoveryPassword2" data-i18n="repeatPassword">Repeat password</label>
+          <div class="text-row"><input id="recoveryPassword2" type="password" autocomplete="new-password" minlength="6" required data-i18n-aria="repeatPassword" aria-label="Repeat password"></div>
+          <button type="submit" class="gate-btn" data-i18n="savePassword">Save password</button>
         </form>
       </section>
 
       <section id="panel-unreachable" class="gate-panel" hidden>
-        <h1>Can't reach the server</h1>
-        <p class="gate-copy">Check your connection and try again. Your rides stay on this phone once you are in.</p>
-        <button type="button" class="gate-btn" id="btnRetry">Try again</button>
+        <h1 data-i18n="unreachableTitle">Can't reach the server</h1>
+        <p class="gate-copy" data-i18n="unreachableBody">Check your connection and try again. Your rides stay on this phone once you are in.</p>
+        <button type="button" class="gate-btn" id="btnRetry" data-i18n="tryAgain">Try again</button>
       </section>
 
       <section id="panel-missing" class="gate-panel" hidden>
-        <h1>Account not ready</h1>
-        <p class="gate-copy">We could not find a profile for this login. Log out and sign up again. If it still happens, contact the seller.</p>
-        <button type="button" class="gate-btn secondary" id="btnMissingLogout">Log out</button>
+        <h1 data-i18n="missingTitle">Account not ready</h1>
+        <p class="gate-copy" data-i18n="missingBody">We could not find a profile for this login. Log out and sign up again. If it still happens, contact the seller.</p>
+        <button type="button" class="gate-btn secondary" id="btnMissingLogout" data-i18n="logout">Log out</button>
       </section>
 
       <p id="gateError" class="gate-error" role="alert"></p>
@@ -128,7 +137,7 @@
           <div class="topbar-date" id="headerDate"></div>
           <div class="topbar-title">
             <img class="mark" src="logo.svg" alt="">
-            <span id="headerTitle">Today</span>
+            <span id="headerTitle" data-i18n="today">Today</span>
           </div>
         </div>
         <div class="sync-pill" id="syncPill">…</div>
@@ -150,113 +159,114 @@
               <circle id="progressRing" cx="100" cy="100" r="86" fill="none" stroke="url(#ringGrad)" stroke-width="14" stroke-linecap="round" transform="rotate(-90 100 100)"/>
             </svg>
             <div class="ring-center">
-              <div class="ring-label">Today's fares</div>
+              <div class="ring-label" data-i18n="todaysFares">Today's fares</div>
               <div class="ring-total" id="ringTotal">RM 0.00</div>
               <button type="button" class="ring-remain" id="ringTargetBtn">
                 <span id="ringRemain">RM 300.00 left of RM 300.00</span>
               </button>
             </div>
           </div>
-          <div class="badge-hit" id="badgeHit">Target hit</div>
+          <div class="badge-hit" id="badgeHit" data-i18n="targetHit">Target hit</div>
         </div>
 
         <div class="stats">
           <div class="stat">
-            <div class="stat-label">Rides</div>
+            <div class="stat-label" data-i18n="rides">Rides</div>
             <div class="stat-value" id="statRides">0</div>
-            <div class="stat-sub">Avg <span id="statAvg">—</span></div>
+            <div class="stat-sub"><span data-i18n="avg">Avg</span> <span id="statAvg">—</span></div>
           </div>
           <div class="stat">
-            <div class="stat-label">Est. left</div>
+            <div class="stat-label" data-i18n="estLeft">Est. left</div>
             <div class="stat-value" id="statLeft">—</div>
-            <div class="stat-sub">rides to target</div>
+            <div class="stat-sub" data-i18n="ridesToTarget">rides to target</div>
           </div>
           <div class="stat">
-            <div class="stat-label">Online</div>
+            <div class="stat-label" data-i18n="online">Online</div>
             <div class="stat-value" id="statHours">—</div>
-            <div class="stat-sub">shift time</div>
+            <div class="stat-sub" data-i18n="shiftTime">shift time</div>
           </div>
           <div class="stat">
-            <div class="stat-label">RM/hr</div>
+            <div class="stat-label" data-i18n="perHour">RM/hr</div>
             <div class="stat-value" id="statRph">—</div>
-            <div class="stat-sub">gross / hour</div>
+            <div class="stat-sub" data-i18n="grossPerHour">gross / hour</div>
           </div>
         </div>
 
         <div class="pay-totals">
           <div class="pay-total cash">
-            <div class="pay-total-label">Cash</div>
+            <div class="pay-total-label" data-i18n="cash">Cash</div>
             <div class="pay-total-val" id="cashTotal">RM 0.00</div>
           </div>
           <div class="pay-total credit">
-            <div class="pay-total-label">Credit</div>
+            <div class="pay-total-label" data-i18n="credit">Credit</div>
             <div class="pay-total-val" id="creditTotal">RM 0.00</div>
           </div>
         </div>
 
         <div class="section-head">
-          <div class="section-title">By platform</div>
+          <div class="section-title" data-i18n="byPlatform">By platform</div>
         </div>
         <div class="plat-totals" id="platformTotals"></div>
 
         <button type="button" class="shift-btn" id="shiftBtn">
           <span class="dot"></span>
-          <span id="shiftLabel">Start shift</span>
+          <span id="shiftLabel" data-i18n="startShift">Start shift</span>
         </button>
 
         <div class="composer">
-          <div class="fare-label">Add a ride</div>
+          <div class="fare-label" data-i18n="addRideLabel">Add a ride</div>
           <div class="fare-row" id="fareRow">
             <span class="fare-prefix">RM</span>
             <input id="fareInput" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="0.00" aria-label="Ride fare amount">
           </div>
-          <div class="fare-label" style="margin-top:12px">Platform</div>
+          <div class="fare-label" style="margin-top:12px" data-i18n="platform">Platform</div>
           <div class="platforms" id="platformRow" role="group" aria-label="Platform"></div>
           <div class="pay-toggle" role="group" aria-label="Payment type">
-            <button type="button" class="pay-btn active" data-pay="cash" id="payCash" aria-pressed="true">Cash</button>
-            <button type="button" class="pay-btn" data-pay="credit" id="payCredit" aria-pressed="false">Credit</button>
+            <button type="button" class="pay-btn active" data-pay="cash" id="payCash" aria-pressed="true" data-i18n="cash">Cash</button>
+            <button type="button" class="pay-btn" data-pay="credit" id="payCredit" aria-pressed="false" data-i18n="credit">Credit</button>
           </div>
           <div class="chips" id="chips"></div>
-          <button type="button" class="btn-add" id="addBtn">Add ride</button>
+          <button type="button" class="btn-add" id="addBtn" data-i18n="addRide">Add ride</button>
         </div>
 
         <div class="net-card">
           <div class="net-row">
-            <div class="net-label">Net earnings</div>
+            <div class="net-label" data-i18n="netEarnings">Net earnings</div>
             <div class="net-value" id="netValue">RM 0.00</div>
           </div>
           <div class="extras">
             <button type="button" class="extra earn" data-field="tips">
-              <div class="extra-name">Tips</div>
+              <div class="extra-name" data-i18n="tips">Tips</div>
               <div class="extra-val" id="extraTips">RM 0.00</div>
             </button>
             <button type="button" class="extra earn" data-field="incentives">
-              <div class="extra-name">Incentives</div>
+              <div class="extra-name" data-i18n="incentives">Incentives</div>
               <div class="extra-val" id="extraIncentives">RM 0.00</div>
             </button>
             <button type="button" class="extra cost" data-field="fuel">
-              <div class="extra-name">Fuel</div>
+              <div class="extra-name" data-i18n="fuel">Fuel</div>
               <div class="extra-val" id="extraFuel">RM 0.00</div>
             </button>
             <button type="button" class="extra cost" data-field="tolls">
-              <div class="extra-name">Tolls</div>
+              <div class="extra-name" data-i18n="tolls">Tolls</div>
               <div class="extra-val" id="extraTolls">RM 0.00</div>
             </button>
           </div>
         </div>
 
         <div class="section-head">
-          <div class="section-title">Today's rides</div>
+          <div class="section-title" data-i18n="todaysRides">Today's rides</div>
           <div class="section-sub" id="rideCountLabel"></div>
         </div>
         <div class="rides" id="rideList"></div>
+        <button type="button" class="btn-share" id="btnShare" data-i18n="shareToday">Share today</button>
       </section>
 
       <section id="screen-history" class="screen" aria-label="History">
         <div class="week-card">
           <div class="week-top">
             <div>
-              <div class="week-label">This week</div>
+              <div class="week-label" data-i18n="thisWeek">This week</div>
               <div class="week-total" id="weekTotal">RM 0.00</div>
             </div>
             <div class="week-label" id="weekMeta">0 rides this week</div>
@@ -265,24 +275,31 @@
           <div class="chip-row" id="weekPlatforms"></div>
         </div>
         <div class="section-head">
-          <div class="section-title">Past days</div>
+          <div class="section-title" data-i18n="pastDays">Past days</div>
         </div>
         <div class="day-list" id="historyList"></div>
       </section>
 
       <section id="screen-settings" class="screen" aria-label="Settings">
         <div class="set-block">
-          <div class="set-label">Account</div>
-          <div class="set-note">Signed in as <span class="account-email" id="accountEmail"></span></div>
+          <div class="set-label" data-i18n="language">Language</div>
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button type="button" class="lang-btn" data-set-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-set-lang="ms">BM</button>
+          </div>
+        </div>
+        <div class="set-block">
+          <div class="set-label" data-i18n="account">Account</div>
+          <div class="set-note"><span data-i18n="signedIn">Signed in as</span> <span class="account-email" id="accountEmail"></span></div>
           <div class="set-actions" style="margin-top:8px">
-            <a class="set-btn" id="adminLink" href="admin.html" hidden>Owner page <span>→</span></a>
-            <button type="button" class="set-btn" id="btnSync">Sync now</button>
-            <button type="button" class="set-btn danger" id="btnLogout">Log out</button>
+            <a class="set-btn" id="adminLink" href="admin.html" hidden><span data-i18n="ownerPage">Owner page</span> <span>→</span></a>
+            <button type="button" class="set-btn" id="btnSync" data-i18n="syncNow">Sync now</button>
+            <button type="button" class="set-btn danger" id="btnLogout" data-i18n="logout">Log out</button>
           </div>
         </div>
 
         <div class="set-block">
-          <div class="set-label">Daily target</div>
+          <div class="set-label" data-i18n="dailyTarget">Daily target</div>
           <div class="target-edit">
             <span>RM</span>
             <input id="targetInput" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Daily earnings target">
@@ -290,24 +307,24 @@
         </div>
 
         <div class="set-block">
-          <div class="set-label">Platforms you use</div>
+          <div class="set-label" data-i18n="platformsYouUse">Platforms you use</div>
           <div id="platformSettings"></div>
         </div>
 
         <div class="set-block">
-          <div class="set-label">Data</div>
+          <div class="set-label" data-i18n="data">Data</div>
           <div class="set-actions">
-            <button type="button" class="set-btn" id="btnExportCsv">Export CSV <span>↓</span></button>
-            <button type="button" class="set-btn" id="btnExportJson">Download backup <span>↓</span></button>
-            <button type="button" class="set-btn" id="btnImportJson">Restore backup <span>↑</span></button>
-            <button type="button" class="set-btn danger" id="btnReset">Reset all data</button>
+            <button type="button" class="set-btn" id="btnExportCsv"><span data-i18n="exportCsv">Export CSV</span> <span>↓</span></button>
+            <button type="button" class="set-btn" id="btnExportJson"><span data-i18n="downloadBackup">Download backup</span> <span>↓</span></button>
+            <button type="button" class="set-btn" id="btnImportJson"><span data-i18n="restoreBackup">Restore backup</span> <span>↑</span></button>
+            <button type="button" class="set-btn danger" id="btnReset" data-i18n="resetAll">Reset all data</button>
           </div>
           <input id="fileImport" class="hidden-file" type="file" accept="application/json,.json">
         </div>
 
         <div class="set-block">
-          <div class="set-label">On your phone</div>
-          <div class="set-note">
+          <div class="set-label" data-i18n="onYourPhone">On your phone</div>
+          <div class="set-note" data-i18n-html="installNote">
             <strong>Add to Home Screen</strong> so this opens like an app.<br><br>
             iPhone: in Safari, tap Share, then Add to Home Screen.<br>
             Android: in Chrome, tap the menu, then Install app or Add to Home screen.<br><br>
@@ -318,17 +335,17 @@
     </main>
 
     <nav class="tabbar" aria-label="Main">
-      <button type="button" class="tab active" data-screen="today" aria-label="Today">
+      <button type="button" class="tab active" data-screen="today" data-i18n-aria="today" aria-label="Today">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        Today
+        <span data-i18n="today">Today</span>
       </button>
-      <button type="button" class="tab" data-screen="history" aria-label="History">
+      <button type="button" class="tab" data-screen="history" data-i18n-aria="history" aria-label="History">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="11" width="3" height="8" rx="1"/><rect x="12" y="7" width="3" height="12" rx="1"/><rect x="17" y="13" width="3" height="6" rx="1"/></svg>
-        History
+        <span data-i18n="history">History</span>
       </button>
-      <button type="button" class="tab" data-screen="settings" aria-label="Settings">
+      <button type="button" class="tab" data-screen="settings" data-i18n-aria="settings" aria-label="Settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-        Settings
+        <span data-i18n="settings">Settings</span>
       </button>
     </nav>
 
@@ -342,8 +359,8 @@
         <input id="sheetInput" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
       <div class="sheet-actions">
-        <button type="button" class="btn-ghost" id="sheetCancel">Cancel</button>
-        <button type="button" class="btn-primary" id="sheetSave">Save</button>
+        <button type="button" class="btn-ghost" id="sheetCancel" data-i18n="cancel">Cancel</button>
+        <button type="button" class="btn-primary" id="sheetSave" data-i18n="save">Save</button>
       </div>
     </div>
     <canvas id="confetti"></canvas>
@@ -352,6 +369,7 @@
   <noscript><p style="padding:24px">RideTarget needs JavaScript turned on.</p></noscript>
   <script src="config.js"></script>
   <script src="calc.js"></script>
+  <script src="i18n.js"></script>
   <script>
     (function () {
       var calc = window.RideTargetCalc;

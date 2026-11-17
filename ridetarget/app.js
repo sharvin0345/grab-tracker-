@@ -3,6 +3,7 @@
   'use strict';
 
   var C = window.RideTargetCalc;
+  var T = window.RideTargetI18n;
   var client = null;
   var userId = null;
   var userEmail = '';
@@ -24,6 +25,26 @@
   var routeGen = 0;
   var platformSig = '';
   var bound = false;
+  var syncMode = 'saved';
+
+  function tr(key, vars) {
+    return T && T.t ? T.t(key, vars) : key;
+  }
+
+  function payName(pay) {
+    return tr(C.normalizePay(pay) === 'credit' ? 'credit' : 'cash');
+  }
+
+  function platformName(name) {
+    return name === 'Other' ? tr('other') : name;
+  }
+
+  function refreshWhatsApp() {
+    var link = $('btnWhatsApp');
+    if (!link || !T) return;
+    var email = ($('lockedEmail') && $('lockedEmail').textContent) || userEmail || '';
+    link.href = T.whatsAppHref(email);
+  }
   var RING_C = 2 * Math.PI * 86;
 
   function $(id) { return document.getElementById(id); }
@@ -76,7 +97,7 @@
     try {
       localStorage.setItem(cacheKey(userId), JSON.stringify(state));
     } catch (e) {
-      showToast('Could not save on this phone. Storage may be full.');
+      showToast(tr('toastStorage'));
     }
   }
 
@@ -98,6 +119,7 @@
       if (el) el.hidden = panel !== name;
     });
     setGateError('');
+    if (name === 'locked') refreshWhatsApp();
   }
 
   function showAuth(which) {
@@ -129,12 +151,12 @@
   function friendlyAuth(error) {
     var msg = String(error && error.message || '');
     var lower = msg.toLowerCase();
-    if (lower.indexOf('invalid') !== -1 || lower.indexOf('credentials') !== -1) return 'Email or password is not right.';
-    if (lower.indexOf('already') !== -1) return 'That email is already registered. Log in instead.';
-    if (lower.indexOf('confirm') !== -1) return 'Confirm your email first, then log in.';
-    if (lower.indexOf('password') !== -1 && lower.indexOf('weak') !== -1) return 'Use at least 6 characters.';
-    if (lower.indexOf('rate') !== -1 || lower.indexOf('too many') !== -1) return 'Too many tries. Wait a minute and try again.';
-    return msg || 'Something went wrong. Try again.';
+    if (lower.indexOf('invalid') !== -1 || lower.indexOf('credentials') !== -1) return tr('errCredentials');
+    if (lower.indexOf('already') !== -1) return tr('errExists');
+    if (lower.indexOf('confirm') !== -1) return tr('errConfirm');
+    if (lower.indexOf('password') !== -1 && lower.indexOf('weak') !== -1) return tr('errShort');
+    if (lower.indexOf('rate') !== -1 || lower.indexOf('too many') !== -1) return tr('errRate');
+    return msg || tr('errGeneric');
   }
 
   function isOfflineError(err) {
@@ -343,7 +365,7 @@
       day.celebrated = true;
       state.settingsDirty = true;
       burstConfetti();
-      showToast('Target hit — nice work!');
+      showToast(tr('toastHit'));
     }
   }
 
@@ -397,7 +419,7 @@
     saveLocal();
     render();
     scheduleSync();
-    showToast('Ride removed', true);
+    showToast(tr('toastRemoved'), true);
     buzz(8);
   }
 
@@ -475,7 +497,7 @@
     var on = state.platforms.indexOf(name) !== -1;
     if (on) {
       if (state.platforms.length <= 1) {
-        showToast('Keep at least one platform');
+        showToast(tr('toastKeepOne'));
         return;
       }
       state.platforms = state.platforms.filter(function (item) { return item !== name; });
@@ -669,7 +691,7 @@
   }
 
   function downloadBlob(filename, mime, text) {
-    var blob = new Blob([text], { type: mime });
+    var blob = text instanceof Blob ? text : new Blob([text], { type: mime });
     var url = URL.createObjectURL(blob);
     var link = document.createElement('a');
     link.href = url;
@@ -893,7 +915,7 @@
     }
     if (!navigator.onLine) {
       setSync('offline');
-      if (manual) showToast('You are offline');
+      if (manual) showToast(tr('toastOffline'));
       return;
     }
     clearTimeout(syncTimer);
@@ -923,20 +945,20 @@
         if (state.rev !== rev) syncAgain = true;
       } while (syncAgain);
       setSync(hasDirty() ? 'pending' : 'saved');
-      if (manual && !hasDirty()) showToast('Synced');
+      if (manual && !hasDirty()) showToast(tr('toastSynced'));
     } catch (err) {
       if (isAuthError(err)) {
-        showToast('Please log in again');
+        showToast(tr('toastLoginAgain'));
         client.auth.signOut();
         return;
       }
       if (isOfflineError(err)) {
         setSync('offline');
-        if (manual) showToast('You are offline');
+        if (manual) showToast(tr('toastOffline'));
         return;
       }
       setSync('error');
-      if (manual) showToast('Could not sync yet');
+      if (manual) showToast(tr('toastSyncFail'));
     } finally {
       syncing = false;
       if (syncAgain && approved) scheduleSync();
@@ -959,7 +981,7 @@
     if (withUndo) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.textContent = 'Undo';
+      btn.textContent = tr('undo');
       btn.addEventListener('click', undoLast);
       el.appendChild(btn);
     }
@@ -975,11 +997,12 @@
   }
 
   function setSync(mode) {
+    syncMode = mode || 'saved';
     var pill = $('syncPill');
     if (!pill) return;
-    pill.className = 'sync-pill ' + mode;
-    var labels = { saved: 'Synced', saving: 'Saving…', offline: 'Offline', pending: 'Will sync', error: 'Not synced' };
-    pill.textContent = labels[mode] || 'Synced';
+    pill.className = 'sync-pill ' + syncMode;
+    var labels = { saved: tr('synced'), saving: tr('saving'), offline: tr('offline'), pending: tr('willSync'), error: tr('notSynced') };
+    pill.textContent = labels[syncMode] || tr('synced');
   }
 
   function openSheet(field, title, current) {
@@ -1014,7 +1037,7 @@
         shake($('sheetInput').parentElement);
         return;
       }
-      showToast('Daily target set to ' + C.formatRM(state.target));
+      showToast(tr('toastTarget', { amount: C.formatRM(state.target) }));
     } else if (sheetField) {
       setExtra(sheetField, n);
     }
@@ -1047,13 +1070,13 @@
     var key = C.dateKey();
     if (currentScreen === 'today') {
       $('headerDate').textContent = C.formatLongDate(key);
-      $('headerTitle').textContent = 'Today';
+      $('headerTitle').textContent = tr('today');
     } else if (currentScreen === 'history') {
-      $('headerDate').textContent = 'This week and past days';
-      $('headerTitle').textContent = 'History';
+      $('headerDate').textContent = tr('weekAndPast');
+      $('headerTitle').textContent = tr('history');
     } else {
       $('headerDate').textContent = 'RideTarget';
-      $('headerTitle').textContent = 'Settings';
+      $('headerTitle').textContent = tr('settings');
     }
   }
 
@@ -1065,8 +1088,8 @@
     $('statRph').textContent = stats.rph == null ? '—' : C.formatRM(stats.rph);
     $('shiftBtn').classList.toggle('on', on);
     $('shiftLabel').textContent = on
-      ? 'End shift · ' + C.formatDuration(stats.ms)
-      : (stats.ms > 0 ? 'Start shift again' : 'Start shift');
+      ? tr('endShift') + ' · ' + C.formatDuration(stats.ms)
+      : (stats.ms > 0 ? tr('startShiftAgain') : tr('startShift'));
   }
 
   function renderToday() {
@@ -1082,10 +1105,10 @@
     if (stats.hit) {
       var over = C.roundMoney(stats.rideTotal - state.target);
       $('ringRemain').textContent = over > 0
-        ? C.formatRM(over) + ' over ' + C.formatRM(state.target)
-        : 'Target reached';
+        ? tr('targetOver', { over: C.formatRM(over), target: C.formatRM(state.target) })
+        : tr('targetReached');
     } else {
-      $('ringRemain').textContent = C.formatRM(stats.remaining) + ' left of ' + C.formatRM(state.target);
+      $('ringRemain').textContent = tr('targetLeft', { left: C.formatRM(stats.remaining), target: C.formatRM(state.target) });
     }
     $('ringTargetBtn').classList.toggle('hit', stats.hit);
     $('badgeHit').classList.toggle('show', stats.hit);
@@ -1117,16 +1140,16 @@
     if (!rides.length) {
       var empty = document.createElement('div');
       empty.className = 'empty';
-      empty.textContent = 'No rides yet. Add your first fare above.';
+      empty.textContent = tr('noRides');
       list.appendChild(empty);
     } else {
       rides.forEach(function (ride) { list.appendChild(rideRow(ride)); });
     }
-    $('rideCountLabel').textContent = stats.count ? (stats.count + (stats.count === 1 ? ' ride' : ' rides')) : '';
+    $('rideCountLabel').textContent = stats.count ? (stats.count + ' ' + tr(stats.count === 1 ? 'rideOne' : 'rideMany')) : '';
   }
 
   function renderPlatformPicker() {
-    var sig = state.platforms.join('|') + '::' + state.lastPlatform;
+    var sig = state.platforms.join('|') + '::' + state.lastPlatform + '::' + (T ? T.lang() : 'en');
     var row = $('platformRow');
     if (sig === platformSig && row.childElementCount === state.platforms.length) {
       Array.prototype.forEach.call(row.children, function (btn) {
@@ -1144,7 +1167,7 @@
       btn.className = 'plat-btn' + (name === state.lastPlatform ? ' active' : '');
       btn.setAttribute('data-platform', name);
       btn.setAttribute('aria-pressed', name === state.lastPlatform ? 'true' : 'false');
-      btn.textContent = name;
+      btn.textContent = platformName(name);
       btn.addEventListener('click', function () { setPlatform(name); });
       row.appendChild(btn);
     });
@@ -1163,7 +1186,7 @@
       row.className = 'plat-total';
       var label = document.createElement('div');
       label.className = 'plat-total-name';
-      label.textContent = name;
+      label.textContent = platformName(name);
       var value = document.createElement('div');
       value.className = 'plat-total-val';
       value.textContent = C.formatRM(totals[name]);
@@ -1187,10 +1210,10 @@
     time.textContent = C.formatTime(ride.ts);
     var platform = document.createElement('span');
     platform.className = 'plat-badge';
-    platform.textContent = ride.platform;
+    platform.textContent = platformName(ride.platform);
     var badge = document.createElement('span');
     badge.className = 'pay-badge ' + C.normalizePay(ride.pay);
-    badge.textContent = C.payLabel(ride.pay);
+    badge.textContent = payName(ride.pay);
     left.appendChild(time);
     left.appendChild(platform);
     left.appendChild(badge);
@@ -1200,7 +1223,7 @@
     var del = document.createElement('button');
     del.type = 'button';
     del.className = 'ride-del';
-    del.setAttribute('aria-label', 'Delete ride');
+    del.setAttribute('aria-label', tr('deleteRide'));
     del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>';
     del.addEventListener('click', function (event) {
       event.stopPropagation();
@@ -1273,11 +1296,11 @@
       row.appendChild(chip);
     }
     if (pay) {
-      add('Cash ' + C.formatRM(pay.cash));
-      add('Credit ' + C.formatRM(pay.credit));
+      add(tr('cash') + ' ' + C.formatRM(pay.cash));
+      add(tr('credit') + ' ' + C.formatRM(pay.credit));
     }
     C.PLATFORMS.forEach(function (name) {
-      if (totals && totals[name]) add(name + ' ' + C.formatRM(totals[name]));
+      if (totals && totals[name]) add(platformName(name) + ' ' + C.formatRM(totals[name]));
     });
     return row;
   }
@@ -1301,7 +1324,7 @@
       });
     }
     $('weekTotal').textContent = C.formatRM(weekTotal);
-    $('weekMeta').textContent = weekRides + (weekRides === 1 ? ' ride' : ' rides');
+    $('weekMeta').textContent = weekRides + ' ' + tr(weekRides === 1 ? 'rideOne' : 'rideMany');
     var weekBox = $('weekPlatforms');
     weekBox.innerHTML = '';
     var weekChips = chipList(weekPlat, null);
@@ -1336,7 +1359,7 @@
       var label = document.createElement('div');
       label.className = 'bar-lbl';
       var short = C.formatShortDate(bar.key).split(' ')[0].replace(/,/g, '');
-      label.textContent = bar.isToday ? 'Today' : short;
+      label.textContent = bar.isToday ? tr('today') : short;
       col.appendChild(track);
       col.appendChild(label);
       chart.appendChild(col);
@@ -1361,21 +1384,21 @@
       top.className = 'day-top';
       var name = document.createElement('div');
       name.className = 'day-name';
-      name.textContent = dayKey === key ? 'Today · ' + C.formatShortDate(dayKey) : C.formatShortDate(dayKey);
+      name.textContent = dayKey === key ? tr('today') + ' · ' + C.formatShortDate(dayKey) : C.formatShortDate(dayKey);
       var badge = document.createElement('div');
       badge.className = 'day-badge ' + (stats.hit ? 'hit' : 'miss');
-      badge.textContent = stats.hit ? 'Hit' : 'Miss';
+      badge.textContent = stats.hit ? tr('hit') : tr('miss');
       top.appendChild(name);
       top.appendChild(badge);
       var amt = document.createElement('div');
       amt.className = 'day-amt';
       amt.textContent = C.formatRM(stats.rideTotal);
-      var metaBits = [stats.count + (stats.count === 1 ? ' ride' : ' rides')];
+      var metaBits = [stats.count + ' ' + tr(stats.count === 1 ? 'rideOne' : 'rideMany')];
       if (stats.ms > 0) {
         metaBits.push(C.formatDuration(stats.ms));
         if (stats.rph != null) metaBits.push(C.formatRM(stats.rph) + '/h');
       }
-      metaBits.push('Net ' + C.formatRM(stats.net));
+      metaBits.push(tr('netWord') + ' ' + C.formatRM(stats.net));
       var meta = document.createElement('div');
       meta.className = 'day-meta';
       meta.textContent = metaBits.join(' · ');
@@ -1386,17 +1409,17 @@
       if (!rides.length) {
         var none = document.createElement('div');
         none.className = 'day-ride';
-        none.textContent = 'No individual rides logged';
+        none.textContent = tr('noIndividual');
         ridesBox.appendChild(none);
       } else {
         rides.forEach(function (ride) {
           var line = document.createElement('div');
           line.className = 'day-ride';
           var when = document.createElement('span');
-          when.textContent = C.formatTime(ride.ts) + ' · ' + ride.platform;
+          when.textContent = C.formatTime(ride.ts) + ' · ' + platformName(ride.platform);
           var how = document.createElement('span');
           how.className = 'pay-badge ' + C.normalizePay(ride.pay);
-          how.textContent = C.payLabel(ride.pay);
+          how.textContent = payName(ride.pay);
           var value = document.createElement('span');
           value.textContent = C.formatRM(ride.amount);
           line.appendChild(when);
@@ -1416,7 +1439,7 @@
     if (!shown) {
       var empty = document.createElement('div');
       empty.className = 'empty';
-      empty.textContent = 'No history yet. Log rides today and they will show up here.';
+      empty.textContent = tr('noHistory');
       list.appendChild(empty);
     }
   }
@@ -1435,7 +1458,7 @@
       btn.className = 'switch-row';
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       var label = document.createElement('span');
-      label.textContent = name;
+      label.textContent = platformName(name);
       var knob = document.createElement('span');
       knob.className = 'switch' + (on ? ' on' : '');
       btn.appendChild(label);
@@ -1541,7 +1564,7 @@
     }
     input.value = '';
     if (!celebratedNow(before)) {
-      showToast('Added ride · ' + C.payLabel(state.lastPay) + ' · ' + state.lastPlatform);
+      showToast(tr('toastAdded', { pay: payName(state.lastPay), platform: platformName(state.lastPlatform) }));
     }
   }
 
@@ -1568,7 +1591,7 @@
         var before = !!(state.days[C.dateKey()] && state.days[C.dateKey()].celebrated);
         addRide(amount);
         if (!celebratedNow(before)) {
-          showToast('Added ' + C.formatRM(amount) + ' · ' + C.payLabel(state.lastPay) + ' · ' + state.lastPlatform);
+          showToast(tr('toastAddedAmt', { amount: C.formatRM(amount), pay: payName(state.lastPay), platform: platformName(state.lastPlatform) }));
         }
       });
       chips.appendChild(btn);
@@ -1576,13 +1599,13 @@
     Array.prototype.forEach.call(document.querySelectorAll('.extra'), function (btn) {
       btn.addEventListener('click', function () {
         var field = btn.getAttribute('data-field');
-        var titles = { tips: 'Tips today', incentives: 'Incentives today', fuel: 'Fuel today', tolls: 'Tolls today' };
+        var titles = { tips: tr('tipsToday'), incentives: tr('incentivesToday'), fuel: tr('fuelToday'), tolls: tr('tollsToday') };
         var day = readToday();
         openSheet(field, titles[field] || field, day[field] || 0);
       });
     });
     $('ringTargetBtn').addEventListener('click', function () {
-      openSheet('target', 'Daily target', state ? state.target : C.DEFAULT_TARGET);
+      openSheet('target', tr('dailyTarget'), state ? state.target : C.DEFAULT_TARGET);
     });
     $('overlay').addEventListener('click', closeSheet);
     $('sheetCancel').addEventListener('click', closeSheet);
@@ -1598,44 +1621,60 @@
       if (!setTarget(this.value)) {
         shake(this.parentElement);
         this.value = String(state.target);
-        showToast('Enter a target greater than 0');
+        showToast(tr('toastTargetBad'));
       } else {
-        showToast('Daily target set to ' + C.formatRM(state.target));
+        showToast(tr('toastTarget', { amount: C.formatRM(state.target) }));
       }
     });
     $('btnExportCsv').addEventListener('click', function () {
       downloadFile('ridetarget-' + C.dateKey() + '.csv', 'text/csv;charset=utf-8', exportCSV());
-      showToast('CSV ready');
+      showToast(tr('toastCsv'));
     });
     $('btnExportJson').addEventListener('click', function () {
       downloadFile('ridetarget-backup-' + C.dateKey() + '.json', 'application/json;charset=utf-8', exportJSON());
-      showToast('Backup ready');
+      showToast(tr('toastBackup'));
     });
     $('btnImportJson').addEventListener('click', function () { $('fileImport').click(); });
     $('fileImport').addEventListener('change', function () {
       var file = this.files && this.files[0];
       this.value = '';
       if (!file) return;
-      if (!confirm('Replace the rides on this account with this backup?')) return;
+      if (!confirm(tr('confirmImport'))) return;
       var reader = new FileReader();
       reader.onload = function () {
         try {
           importJSON(String(reader.result || ''));
-          showToast('Backup restored');
+          showToast(tr('toastRestored'));
         } catch (err) {
-          showToast('Could not restore that file');
+          showToast(tr('toastRestoreBad'));
         }
       };
       reader.readAsText(file);
     });
     $('btnReset').addEventListener('click', function () {
-      if (confirm('Erase all rides and history for this account? This cannot be undone.')) {
+      if (confirm(tr('confirmReset'))) {
         resetAll();
-        showToast('All data cleared');
+        showToast(tr('toastCleared'));
       }
     });
     $('btnSync').addEventListener('click', function () { syncNow(true); });
     $('btnLogout').addEventListener('click', function () { logout(); });
+    $('btnShare').addEventListener('click', function () { shareToday(); });
+    document.addEventListener('click', function (event) {
+      var langBtn = event.target.closest ? event.target.closest('[data-set-lang]') : null;
+      if (!langBtn || !T) return;
+      T.setLang(langBtn.getAttribute('data-set-lang'));
+    });
+    if (T) {
+      T.onChange(function () {
+        T.apply(document);
+        refreshWhatsApp();
+        if (syncMode) setSync(syncMode);
+        if (state && $('app') && !$('app').hidden) render();
+      });
+      T.apply(document);
+      refreshWhatsApp();
+    }
 
     $('tabLogin').addEventListener('click', function () { showAuthForm('login'); });
     $('tabSignup').addEventListener('click', function () { showAuthForm('signup'); });
@@ -1674,7 +1713,7 @@
     var email = cleanEmail($('loginEmail').value);
     var password = $('loginPassword').value;
     if (!email || !password) {
-      setGateError('Enter your email and password.');
+      setGateError(tr('errNeedLogin'));
       return;
     }
     setFormBusy(form, true);
@@ -1690,7 +1729,7 @@
     var email = cleanEmail($('signupEmail').value);
     var password = $('signupPassword').value;
     if (!email || password.length < 6) {
-      setGateError('Use a valid email and at least 6 characters.');
+      setGateError(tr('errShortSignup'));
       return;
     }
     setFormBusy(form, true);
@@ -1716,7 +1755,7 @@
     var form = $('formForgot');
     var email = cleanEmail($('forgotEmail').value);
     if (!email) {
-      setGateError('Enter your email.');
+      setGateError(tr('errEmail'));
       return;
     }
     setFormBusy(form, true);
@@ -1727,7 +1766,7 @@
       return;
     }
     setGateError('');
-    showToastOnGate('If that email is registered, a reset link is on its way.');
+    showToastOnGate(tr('resetSent'));
   }
 
   function showToastOnGate(msg) {
@@ -1743,11 +1782,11 @@
     var a = $('recoveryPassword').value;
     var b = $('recoveryPassword2').value;
     if (a.length < 6) {
-      setGateError('Use at least 6 characters.');
+      setGateError(tr('errShort'));
       return;
     }
     if (a !== b) {
-      setGateError('Passwords do not match.');
+      setGateError(tr('errMatch'));
       return;
     }
     var form = $('formRecovery');
@@ -1778,11 +1817,11 @@
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
-        $('btnCopyEmail').textContent = 'Copied';
+        $('btnCopyEmail').textContent = tr('copied');
         return;
       }
     } catch (e) { /* fall through */ }
-    setGateError(text ? 'Select and copy: ' + text : 'No email to copy');
+    setGateError(text ? tr('copyFallback', { email: text }) : tr('copyNone'));
   }
 
   async function logout() {
@@ -1796,6 +1835,143 @@
       try { await client.auth.signOut(); } catch (e) { /* still leave */ }
     }
     showAuth('login');
+  }
+
+  function homePageUrl() {
+    return new URL('home.html', window.location.href).href.split('#')[0].split('?')[0];
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    var radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  }
+
+  function drawShareCard() {
+    var canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1080;
+    var ctx = canvas.getContext('2d');
+    var day = readToday();
+    var stats = state ? C.statsFor(day, state.target) : { rideTotal: 0, count: 0, hit: false };
+    var target = state ? state.target : C.DEFAULT_TARGET;
+    var pct = target > 0 ? Math.min(1, stats.rideTotal / target) : 0;
+    var pay = C.payTotals(day);
+
+    ctx.fillStyle = '#0B1220';
+    ctx.fillRect(0, 0, 1080, 1350);
+    var glow = ctx.createRadialGradient(540, 180, 40, 540, 200, 520);
+    glow.addColorStop(0, 'rgba(245,185,66,0.28)');
+    glow.addColorStop(1, 'rgba(245,185,66,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, 1080, 700);
+
+    ctx.fillStyle = '#F5B942';
+    ctx.beginPath();
+    ctx.arc(120, 120, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0B1220';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(120, 120, 22, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#3DDCB2';
+    ctx.beginPath();
+    ctx.arc(120, 120, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#F4F7FB';
+    ctx.font = '800 42px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.fillText('RideTarget', 180, 134);
+    ctx.fillStyle = '#9AABC4';
+    ctx.font = '600 28px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.fillText(C.formatLongDate(C.dateKey()), 80, 230);
+    ctx.fillStyle = '#F5B942';
+    ctx.font = '800 26px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.fillText(tr('todaysFares').toUpperCase(), 80, 300);
+
+    ctx.fillStyle = '#F4F7FB';
+    ctx.font = '800 92px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.fillText(C.formatRM(stats.rideTotal), 80, 410);
+
+    var ringX = 820;
+    var ringY = 390;
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 22;
+    ctx.beginPath();
+    ctx.arc(ringX, ringY, 92, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = '#F5B942';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(ringX, ringY, 92, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * pct);
+    ctx.stroke();
+    ctx.fillStyle = '#F4F7FB';
+    ctx.font = '800 36px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(Math.round(pct * 100) + '%', ringX, ringY + 12);
+    ctx.textAlign = 'left';
+
+    function statBox(x, label, value) {
+      ctx.fillStyle = '#17233A';
+      roundRect(ctx, x, 500, 280, 150, 28);
+      ctx.fill();
+      ctx.fillStyle = '#9AABC4';
+      ctx.font = '700 22px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      ctx.fillText(label.toUpperCase(), x + 24, 555);
+      ctx.fillStyle = '#F4F7FB';
+      ctx.font = '800 40px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      ctx.fillText(value, x + 24, 610);
+    }
+    statBox(80, tr('rides'), String(stats.count));
+    statBox(400, tr('cash'), C.formatRM(pay.cash));
+    statBox(720, tr('credit'), C.formatRM(pay.credit));
+
+    ctx.fillStyle = '#F4F7FB';
+    ctx.font = '800 40px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.fillText(tr('shareText'), 80, 760);
+    ctx.fillStyle = '#9AABC4';
+    ctx.font = '600 28px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    var goalLine = tr('targetLeft', { left: C.formatRM(Math.max(0, target - stats.rideTotal)), target: C.formatRM(target) });
+    if (stats.hit) goalLine = tr('targetReached');
+    ctx.fillText(goalLine, 80, 810);
+
+    ctx.fillStyle = '#F5B942';
+    roundRect(ctx, 80, 900, 920, 110, 28);
+    ctx.fill();
+    ctx.fillStyle = '#1A1203';
+    ctx.font = '800 26px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    var link = homePageUrl().replace(/^https:\/\//, '');
+    if (ctx.measureText(link).width > 860) {
+      ctx.font = '800 22px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    }
+    ctx.fillText(link, 110, 966);
+    return canvas;
+  }
+
+  function shareToday() {
+    var canvas = drawShareCard();
+    var name = 'ridetarget-' + C.dateKey() + '.png';
+    canvas.toBlob(function (blob) {
+      if (!blob) return;
+      var file = new File([blob], name, { type: 'image/png' });
+      var text = tr('shareText');
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: 'RideTarget', text: text }).catch(function (err) {
+          if (err && err.name === 'AbortError') return;
+          downloadBlob(name, 'image/png', blob);
+          showToast(tr('toastShare'));
+        });
+        return;
+      }
+      downloadBlob(name, 'image/png', blob);
+      showToast(tr('toastShare'));
+    }, 'image/png');
   }
 
   function registerSw() {
@@ -1833,7 +2009,8 @@
   window.__ridetarget = {
     addRide: function (amount, ts, pay, platform) { return addRide(amount, ts, pay, platform); },
     getState: function () { return state; },
-    formatRM: C.formatRM
+    formatRM: C.formatRM,
+    drawShareCard: drawShareCard
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

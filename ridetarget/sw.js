@@ -1,16 +1,23 @@
 /* RideTarget shell cache. Network first, so a Pages update is picked up when online. */
-var CACHE = 'ridetarget-shell-v2';
+var CACHE = 'ridetarget-shell-v3';
 var SHELL = [
   './',
   './index.html',
+  './home.html',
   './admin.html',
   './styles.css',
+  './home.css',
   './config.js',
   './calc.js',
+  './i18n.js',
   './app.js',
+  './home.js',
   './admin.js',
   './manifest.json',
   './logo.svg',
+  './og.png',
+  './media/today.png',
+  './media/history.png',
   './icon-180.png',
   './icon-192.png',
   './icon-512.png',

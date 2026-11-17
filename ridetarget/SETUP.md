@@ -99,7 +99,17 @@ update public.profiles set is_admin = true, approved = true where email = 'you@e
 
 **Revoke** locks them out again. Their rides stay saved. Approve them later and the rides come back.
 
-## 9. Put it on the Home Screen
+## 9. WhatsApp number and price
+
+Open `ridetarget/config.js`. Change only these three lines:
+
+- `WHATSAPP_NUMBER` — your WhatsApp number, country code first, digits only. Example: `60123456789`
+- `PRICE_RM` — the normal lifetime price (20)
+- `LAUNCH_PRICE_RM` — the price you charge now (15)
+
+Save the file to `main`. The Buy button and the waiting screen use that number.
+
+## 10. Put it on the Home Screen
 
 In Safari, open the app link → Share → **Add to Home Screen**. The name is RideTarget.
 
